@@ -1,0 +1,5 @@
+    	<span>&copy; Copyright {{ now|date('Y') }}. All rights reserved. Powered by <a href="http://www.boxbilling.com" title="Billing system" target="_blank">BoxBilling {{ guest.system_version }}</a>
+                    {% if constant("BB_DEBUG") %}
+                    <a href="http://www.boxbilling.com/forum" title="" target="_blank" style="float:right;">Report bug</a>
+                    {% endif %}
+        </span>

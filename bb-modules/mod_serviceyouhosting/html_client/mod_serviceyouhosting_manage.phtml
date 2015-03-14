@@ -1,0 +1,227 @@
+{% set yh = client.serviceyouhosting_info({'order_id':order.id}) %}
+
+{% if order.status == 'pending_setup' %}
+    <div class="nNote">
+        <div class="nInformation">
+            <p>{% trans 'Order activation process will start after confirmation' %}</p>
+        </div>
+    </div>
+{% endif %}
+
+
+{% if not yh.is_youhosting_client %}
+
+<div class="nNote">
+    <div class="nFailure">
+        <p>{% trans 'Solve captcha to activate order' %}</p>
+    </div>
+</div>
+
+<div class="widget">
+    <div class="head">
+        <h2 class="dark-icon i-services">{% trans 'Action required' %}</h2>
+    </div>
+    <div class="body">
+        <form method="post" action="client/serviceyouhosting/signup" class="api-form" data-api-reload="1">
+            <fieldset>
+                {% set captcha = client.serviceyouhosting_captcha({"for_client":1}) %}
+                <img src="{{ captcha.url }}" alt="Captcha">
+                <input type="text" name="captcha_solution" value="" />
+                <input type="hidden" name="captcha_id" value="{{ captcha.id }}" />
+                <input type="submit" value="{% trans 'Activate' %}" class="greyishBtn submitForm" />
+            </fieldset>
+        </form>
+    </div>
+</div>
+
+{% endif %}
+
+{% if order.status == 'failed_setup' %}
+
+<div class="nNote">
+    <div class="nFailure">
+        <p>{% trans 'Solve captcha to activate order' %}</p>
+    </div>
+</div>
+
+<div class="widget">
+    <div class="head">
+        <h2 class="dark-icon i-services">{% trans 'Order activation captcha' %}</h2>
+    </div>
+    <div class="body">
+        <form method="post" action="client/serviceyouhosting/activate" class="api-form" data-api-reload="1">
+            <fieldset>
+                {% set captcha = client.serviceyouhosting_captcha %}
+                <img src="{{ captcha.url }}" alt="Captcha">
+                <input type="text" name="captcha_solution" value="" />
+                <input type="hidden" name="captcha_id" value="{{ captcha.id }}" />
+                <input type="hidden" name="order_id" value="{{ order.id }}" />
+                <input type="submit" value="{% trans 'Activate' %}" class="greyishBtn submitForm" />
+            </fieldset>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% if order.status == 'active' %}
+
+{%  set product = guest.product_get({"id":order.product_id}) %}
+
+<div class="widget simpleTabs tabsRight">
+    <div class="head">
+        <h2 class="dark-icon i-services">{% trans 'Hosting management' %}</h2>
+    </div>
+
+    <ul class="tabs">
+        <li><a href="#tab-details">{% trans 'Details' %}</a></li>
+        <li><a href="#tab-ftp">{% trans 'FTP Details' %}</a></li>
+        <li><a href="#tab-nameservers">{% trans 'Nameservers' %}</a></li>
+    </ul>
+
+    <div class="tabs_container">
+
+        <div class="tab_content" id="tab-details">
+
+            <table>
+                <tbody>
+
+                    <tr>
+                        <td>{% trans 'Hostname' %}:</td>
+                        <td>
+                            <a target="_blank" href="http://{{ yh.account.domain }}">{{ yh.account.domain }}</a>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>{% trans 'Account status' %}:</td>
+                        <td>
+
+                            {{ yh.account.status | title }}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>{% trans 'Account ID' %}:</td>
+                        <td>
+
+                            {{ yh.account.id }}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>{% trans 'Username' %}:</td>
+                        <td>
+                            {{ yh.account.username }}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>{% trans 'IP' %}:</td>
+                        <td>
+                            {{ yh.account.ip }}
+                        </td>
+                    </tr>
+
+                </tbody>
+
+                <tfoot>
+
+                    <tr>
+                        <td colspan="2">
+                            <a class="bb-button bb-button-submit" href="#" id="open-cpanel"><span class="light-icon i-services"></span> {% trans 'Open Control Panel' %}</a>
+                        </td>
+                    </tr>
+
+                </tfoot>
+            </table>
+
+            <div class="clear"></div>
+        </div>
+
+        <div class="tab_content" id="tab-ftp">
+
+            <table>
+                <tbody>
+
+                <tr>
+                    <td>FTP IP</td>
+                    <td><a target="_blank" href="ftp://{{ yh.account.ip }}">{{ yh.account.ip }}</a></td>
+                </tr>
+                <tr>
+                    <td>FTP Hostname</td>
+                    <td><a target="_blank" href="ftp://{{ yh.account.domain }}">{{ yh.account.domain }}</a></td>
+                </tr>
+                <tr>
+                    <td>FTP Username</td>
+                    <td>{{ yh.account.username }}</td>
+                </tr>
+                <tr>
+                    <td>FTP Password</td>
+                    <td>••••••••••</td>
+                </tr>
+                <tr>
+                    <td>FTP Port</td>
+                    <td>21</td>
+                </tr>
+                <tr>
+                    <td>Folder to Upload Files</td>
+                    <td>public_html</td>
+                </tr>
+
+                <tr>
+                    <td>Recommended FTP Clients</td>
+                    <td><a target="_blank" href="http://www.smartftp.com/">SmartFTP</a> or <a target="_blank" href="http://filezilla-project.org/">FileZilla</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="clear"></div>
+        </div>
+
+        <div class="tab_content" id="tab-nameservers">
+
+            <table>
+                <tbody>
+
+                <tr>
+                    <td>{{ yh.ns.ns1 }}</td>
+                    <td>{{ yh.ns.ip1 }}</td>
+                </tr>
+
+                <tr>
+                    <td>{{ yh.ns.ns2 }}</td>
+                    <td>{{ yh.ns.ip2 }}</td>
+                </tr>
+
+                <tr>
+                    <td>{{ yh.ns.ns3 }}</td>
+                    <td>{{ yh.ns.ip3 }}</td>
+                </tr>
+
+                <tr>
+                    <td>{{ yh.ns.ns4 }}</td>
+                    <td>{{ yh.ns.ip4 }}</td>
+                </tr>
+
+                </tbody>
+            </table>
+
+            <div class="clear"></div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        $('#open-cpanel').bind('click', function (){
+            bb.post('client/serviceyouhosting/cpanel_url',{order_id:{{ order.id }}},function(result){
+                window.open(result, '_blank');
+            });
+            return false;
+        });
+    });
+</script>
+
+{% endif %}

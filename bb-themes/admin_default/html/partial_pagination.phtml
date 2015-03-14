@@ -1,0 +1,32 @@
+{% if list.pages > 1 %}
+{% set currentPage = request.page|default(1) %}
+{% set paginator = guest.system_paginator({"total":list.total, "page":currentPage, "per_page":list.per_page}) %}
+
+<div class="pagination">
+    <ul class="pages">
+        {% if paginator.currentpage != 1 %}
+            <li class="prev"><a href="{{ url|alink }}?{% for k,v in {}|merge(request)|merge({'page': currentPage-1}) %}{{k}}={{v}}{% if loop.last == FALSE %}&{%endif%}{% endfor %}"><</a></li>
+        {% endif %}
+        {% for i in 1..paginator.numpages%}
+            {% if paginator.range.0 > 2 and i == paginator.range.0 %}
+                  ...
+            {% endif %}
+
+            {%  if(i==1 or i==paginator.numpages or i in paginator.range) %}
+                {% if i==paginator.currentpage %}
+                    <li><a class="active" href="#" onclick="return false;">{{i}}</a></li>
+                {% else %}
+                <li><a href="{{ url|alink }}?{% for k,v in {}|merge(request)|merge({'page': i}) %}{{k}}={{v}}{% if loop.last == FALSE %}&{%endif%}{% endfor %}"> {{i}}</a></li>
+                {% endif %}
+            {% endif %}
+
+            {% if paginator.range[paginator.midrange -1] < paginator.numpages -1 and i == paginator.range[paginator.midrange-1] %}
+                ...
+            {% endif %}
+        {% endfor %}
+        {% if paginator.currentpage != paginator.numpages %}
+        <li class="next"><a href="{{ url|alink }}?{% for k,v in {}|merge(request)|merge({'page': currentPage+1}) %}{{k}}={{v}}{% if loop.last == FALSE %}&{%endif%}{% endfor %}">></a></li>
+        {% endif %}
+    </ul>
+</div>
+{% endif %}

@@ -1,0 +1,39 @@
+{% extends request.ajax ? "layout_blank.phtml" : "layout_default.phtml" %}
+{% import "macro_functions.phtml" as mf %}
+{% block meta_title %}Forum members{% endblock %}
+
+{% block content %}
+
+    <div class="alphas">
+        <a href="{{'forum/members-list'|link}}">{% trans 'All' %}</a>
+        {% for i in range('a', 'z') %}
+        <a href="{{'forum/members-list'|link}}?first_char={{ i }}#memberlist">{{ i|upper }}</a>
+        {% endfor %}
+    </div>
+	
+    <table id="memberlist">
+		<thead>
+		<tr>
+			<th>Username</th>
+			<th>Posts</th>
+			<th>Joined</th>
+		</tr>
+		</thead>
+        
+		<tbody>
+        {% set members = guest.forum_members_list({"per_page":20}|merge(request)) %} 
+        {% for member in members.list %} 
+        <tr>
+            <td>{{member.name}}</td>
+            <td>{{member.posts}}</td>
+            <td>{{member.created_at|bb_date}}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td>The list is empty</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+	</table>
+
+{% endblock %}
